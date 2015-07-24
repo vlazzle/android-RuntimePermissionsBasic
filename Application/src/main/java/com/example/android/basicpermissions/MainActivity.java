@@ -24,6 +24,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -44,9 +46,11 @@ import android.widget.Toast;
  * CameraPreviewActivity}
  * if the permission has been granted.
  */
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
 
     private static final int PERMISSION_REQUEST_CAMERA = 0;
+    private static final boolean CRASH = true;
+    private boolean mShouldShowDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,9 +83,29 @@ public class MainActivity extends Activity {
                 // Permission request was denied.
                 Toast.makeText(this, "Camera permission request was denied.", Toast.LENGTH_SHORT)
                         .show();
+
+                if (CRASH) {
+                    createAndShowDialog();
+                } else {
+                    mShouldShowDialog = true;
+                }
             }
         }
         // END_INCLUDE(onRequestPermissionsResult)
+    }
+
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+        if (mShouldShowDialog && !CRASH) {
+            createAndShowDialog();
+        }
+    }
+
+    private void createAndShowDialog() {
+        final DialogFragment dialog = new DialogFragment();
+        dialog.setStyle(DialogFragment.STYLE_NORMAL, 0);
+        dialog.show(getSupportFragmentManager(), "dialog");
     }
 
     private void showCameraPreview() {
